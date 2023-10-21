@@ -1,0 +1,27 @@
+services:
+  redis: 
+    image: redis:7.2.2-alpine
+    container_name: redis
+    restart: always
+    expose:
+      - 6379
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis_volume:/data
+
+  web:
+    build: .
+    container_name: web
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis  
+    links:
+      - redis
+
+volumes:
+  redis_volume:
+    driver: local
+
