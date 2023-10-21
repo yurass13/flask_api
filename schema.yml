@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: Test API for interaction with Redis
+  version: 1.0.0
+  description: API для взаимодействия с Redis
+paths:
+  /v1/variables/:
+    get:
+      operationId: get_variables
+      tags:
+      - Variable
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VariableSerializerList'
+          description: 'List all variables in Redis'
+    post:
+      operationId: set_variable
+      tags:
+      - Variable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Variable'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variable'
+          description: 'Ok'
+        '400':
+          description: 'Bad request'
+  /v1/variables/{key}/:
+    get:
+      operationId: get_variable
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        description: Name of variable.
+        required: true
+      tags:
+      - Variable
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variable'
+          description: ''
+        '404':
+          description: 'Variable not found'
+    patch:
+      operationId: update_variable
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        description: Name of variable.
+        required: true
+      tags:
+      - Variable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVariable'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variable'
+          description: 'Updated'
+        '404':
+          description: 'Variable not found'
+        '400':
+          description: 'Bad request'
+components:
+  schemas:
+    Variable:
+      type: object
+      properties:
+        key:
+          type: string
+          example: 'variableName'
+        value:
+          type: string
+          example: 'variableValue'
+      required:
+      - key
+      - value
+    VariableSerializerList:
+      type: object
+      properties:
+        key:
+          type: string
+          example: 'variableName'
+        value:
+          type: string
+          example: 'variableValue'
+      required:
+      - key
+      - value
+    PatchedVariable:
+      type: object
+      properties:
+        key:
+          type: string
+          example: 'variableName'
+        value:
+          type: string
+          example: 'variableValue'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
