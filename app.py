@@ -18,12 +18,11 @@ def endpoint():
             if value is None:
                 abort(404, "Key is not defined!")
             else:
-                return json.dumps({key: value.decode('utf-8')})
+                return {key: value.decode('utf-8')}
         else:
             # all()
-            data = {key.decode('utf-8'): redis.get(key).decode('utf-8')
-                                         for key in redis.scan_iter()}
-            return json.dumps(data)
+            return {key.decode('utf-8'): redis.get(key).decode('utf-8')
+                      for key in redis.scan_iter()}
 
     elif request.method == "POST":
         excepted = []
@@ -37,7 +36,7 @@ def endpoint():
             abort(412, f"Variables exists!\n\
                         Variables: {inline_excepted} - exists in DB!")
         else:
-            return ""
+            return {'status': 'Ok'}
 
     elif request.method == "PUT":
         exists = redis.exists(*list(request.args.keys()))
@@ -45,7 +44,7 @@ def endpoint():
         if exists == len(request.args.keys()):
             for key, value in request.args.items():
                 redis.set(name=key, value=value)
-            return ""
+            return {'status': 'Ok'}
         else:
             abort(404, f"Variable not Found!\n")
     else:
